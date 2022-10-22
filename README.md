@@ -1,4 +1,4 @@
 # CLV-prediction-platform
 
-##Project Description
+#Project Description
 The project is an CLV prediction platform
