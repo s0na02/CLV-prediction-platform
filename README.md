@@ -7,3 +7,6 @@ Customer data is collected in a CRM database, which allows for advanced analysis
 Businesses can manage marketing decisions based on CLV predictions.
 They can also manage risks related to customers.
 
+
+To explore our project deeper, please check out attached files.
+Thanks!
