@@ -34,7 +34,22 @@ Dataset contains 8 attributes. You can find description of each down below:
 
 **Country** - _Customer's residence country._
 
+### Data Preperation
 
-To explore our project deeper, please check out attached files.
+For data preperation stage our group cleaned the data and also created new features that will be needed in later stages for calculating the CLV.
 
-Thanks!
+For cleaning the data, we removed all the duplicates.
+
+For **Quantity**, we will consider only positive quantities, as negative values indicate that the product was returned for some reason.
+
+**Total Purchase** = **UnitPrice** x **Quantity**
+
+**Avg order value** =  money spent / number of transactions
+
+**Purchase Frequency** = average number of orders from each customer
+
+**Churn Rate** = the percentage of customers who have not ordered again
+
+**CLTV** = (Average Order Value x Purchase Frequency) / Churn Rate
+
+
