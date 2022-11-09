@@ -7,6 +7,14 @@ Customer data is collected in a CRM database, which allows for advanced analysis
 Businesses can manage marketing decisions based on CLV predictions.
 They can also manage risks related to customers.
 
+## Dataset
+
+### Dataset Information
+
+Dataset is taken from UCI (https://archive.ics.uci.edu/ml/datasets/online+retail#). 
+This international dataset includes every transaction made by a UK-based internet retailer between December 1, 2010, and December 9, 2011. The company primarily offers unique gifts for every occasion. The company has a large number of wholesalers as clients.
+
+
 
 To explore our project deeper, please check out attached files.
 
