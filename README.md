@@ -1,4 +1,4 @@
-# CLV-prediction-platform
+# CLV Prediction Platform
 
 ## Why CLV?
 
