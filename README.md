@@ -18,21 +18,21 @@ This international dataset includes every transaction made by a UK-based interne
 
 Dataset contains 8 attributes. You can find description of each down below:
 
-InvoiceNo - 6-digit unique number assigned to each transaction. If code starts with 'c', it indicates a cancellation.
+**InvoiceNo** - _6-digit unique number assigned to each transaction. If code starts with 'c', it indicates a cancellation._
 
-StockCode - Product code is a 5-digit unique number assigned to each product.                                                         
+**StockCode** - _Product code is a 5-digit unique number assigned to each product.                                                         
 
-Description - Product name                                                                                                                
+**Description** - _Product name                                                                                                                
 
-Quantity - The quantities of each product per transaction.                                                                              
+**Quantity** - _The quantities of each product per transaction.                                                                              
 
-InvoiceDate - the date and time when each transaction was generated.                                                                       
+**InvoiceDate** - _The date and time when each transaction was generated.                                                                       
 
-UnitPrice - Product price per unit.
+**UnitPrice** - _Product price per unit.
 
-CustomerID - Customer number is a 5-digit unique number assigned to each customer.
+**CustomerID** - _Customer number is a 5-digit unique number assigned to each customer.
 
-Country - Customer's residence country.
+**Country** - _Customer's residence country.
 
 
 To explore our project deeper, please check out attached files.
