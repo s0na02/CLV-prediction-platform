@@ -18,39 +18,22 @@ This international dataset includes every transaction made by a UK-based interne
 
 Dataset contains 8 attributes. You can find description of each down below:
 
-____________________________________________________________________________________________________________________________________________________
+InvoiceNo - 6-digit unique number assigned to each transaction. If code starts with 'c', it indicates a cancellation.
 
-|  InvoiceNo         | Invoice number is a 6-digit unique number assigned to each transaction. If code starts with 'c', it indicates a cancellation.|
+StockCode - Product code is a 5-digit unique number assigned to each product.                                                         
 
-|____________________|______________________________________________________________________________________________________________________________|
+Description - Product name                                                                                                                
 
-|  StockCode         | Product code is a 5-digit unique number assigned to each product.                                                            |
+Quantity - The quantities of each product per transaction.                                                                              
 
-|____________________|______________________________________________________________________________________________________________________________|
+InvoiceDate - the date and time when each transaction was generated.                                                                       
 
-|  Description       | Product name                                                                                                                 |
+UnitPrice - Product price per unit.
 
-|____________________|______________________________________________________________________________________________________________________________|
+CustomerID - Customer number is a 5-digit unique number assigned to each customer.
 
-|  Quantity          | The quantities of each product per transaction.                                                                              |
+Country - Customer's residence country.
 
-|____________________|______________________________________________________________________________________________________________________________|
-
-|  InvoiceDate       | The date and time when each transaction was generated.                                                                       |
-
-|____________________|______________________________________________________________________________________________________________________________|
-
-|  UnitPrice         | Product price per unit.
-
-|____________________|_____________________________________________________
-
-|  CustomerID        | Customer number is a 5-digit unique number assigned to each customer.
-
-|____________________|__________________________________________________________
-
-|  Country           | Customer's residence country.
-
-|____________________|______________________________________________________
 
 To explore our project deeper, please check out attached files.
 
