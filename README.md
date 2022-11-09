@@ -20,19 +20,19 @@ Dataset contains 8 attributes. You can find description of each down below:
 
 **InvoiceNo** - _6-digit unique number assigned to each transaction. If code starts with 'c', it indicates a cancellation._
 
-**StockCode** - _Product code is a 5-digit unique number assigned to each product.                                                         
+**StockCode** - _Product code is a 5-digit unique number assigned to each product._                                                    
 
-**Description** - _Product name                                                                                                                
+**Description** - _Product name_                                                                                                                
 
-**Quantity** - _The quantities of each product per transaction.                                                                              
+**Quantity** - _The quantities of each product per transaction. _                                                                             
 
-**InvoiceDate** - _The date and time when each transaction was generated.                                                                       
+**InvoiceDate** - _The date and time when each transaction was generated._                                                                       
 
-**UnitPrice** - _Product price per unit.
+**UnitPrice** - _Product price per unit._
 
-**CustomerID** - _Customer number is a 5-digit unique number assigned to each customer.
+**CustomerID** - _Customer number is a 5-digit unique number assigned to each customer._
 
-**Country** - _Customer's residence country.
+**Country** - _Customer's residence country._
 
 
 To explore our project deeper, please check out attached files.
