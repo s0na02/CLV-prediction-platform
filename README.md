@@ -52,4 +52,4 @@ For **Quantity**, we will consider only positive quantities, as negative values 
 
 **CLTV** = (Average Order Value x Purchase Frequency) / Churn Rate
 
-
+To see the code for this steps, please check the corresponding markdown file called: CLV_Data_Preperation.ipynb.
