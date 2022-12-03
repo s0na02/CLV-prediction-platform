@@ -1,110 +1,202 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output, State
-import dash_daq as daq
-import dash_bootstrap_components as dbc
-import numpy as np
 import pandas as pd
-import logging
-import plotly.graph_objs as go
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from lifelines import CoxPHFitter
+from pandas_profiling import ProfileReport
+import datetime as dt
 import plotly.express as px
-import layout
-import pre_processing as pp
+import plotly.graph_objects as go
+from lifetimes import BetaGeoFitter
+from lifetimes import GammaGammaFitter
+from lifetimes.plotting import *
+from lifetimes.utils import *
+from lifetimes.utils import summary_data_from_transaction_data
+from lifetimes.plotting import plot_probability_alive_matrix
+from lifetimes.plotting import plot_frequency_recency_matrix
+from lifetimes.plotting import plot_period_transactions
+from lifetimes.utils import calibration_and_holdout_data
+import squarify
+# TODO: from wordcloud import WordCloud
+
+from dash import Dash, html, dcc
+from dash.dependencies import Input, Output
+
+data = pd.read_excel("Dataset.xlsx")
+
+data['InvoiceDate'].agg(['min', 'max'])
+
+fd = data.drop_duplicates()
 
 
-app = dash.Dash(__name__)
+# TODO:
+# text = " ".join(review for review in data.Country.astype(str))
+# x, y = np.ogrid[:300, :00]
+# #mask = (x - 150) ** 2 + (y - 150) ** 2 > 130 ** 2
+# #mask = 560 * mask.astype(int)
+# wc = WordCloud(background_color="white", repeat=True, width=1600, height=800,  colormap='Dark2',)
+# wc.generate(text)
+# plt.axis("off")
 
-server = app.server
+# total purchase category plot
+fd = fd[['Customer ID','Description','InvoiceDate','Invoice','Quantity','Price', 'Country']]
+fd = fd[(fd['Quantity']>0)]
+fd['TotalPurchase'] = fd['Quantity'] * fd['Price']
 
-app.layout = layout.layout_all
+df_plot_bar = fd.groupby('Description').agg({'TotalPurchase':'sum'}).sort_values(by = 'TotalPurchase', ascending=False).reset_index().head(5)
+df_plot_bar['Percent'] = round((df_plot_bar['TotalPurchase'] / df_plot_bar['TotalPurchase'].sum()) * 100,2)
+fir_plotbar = px.bar(df_plot_bar, y='Percent', x='Description', title='Top selling products', 
+text='Percent', color='Percent')
+fir_plotbar.update_traces(texttemplate='%{text:.2s}', textposition='inside')
+fir_plotbar.update_layout({
+'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+'paper_bgcolor': 'rgba(1, 0, 0, 0)',
+})
+fir_plotbar.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',showlegend=False)
 
+#  
+df_plot = fd.groupby(['Country','Description','Price','Quantity']).agg({'TotalPurchase': 'sum'},{'Quantity':'sum'}).reset_index()
+fig_miricle = px.scatter(df_plot[:25000], x="Price", y="Quantity", color = 'Country', 
+        size='TotalPurchase',  size_max=20, log_y= True, log_x= True, title= "PURCHASE TREND ACROSS COUNTRIES")
+fig_miricle.update_layout({
+'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+'paper_bgcolor': 'rgba(1, 0, 0, 0)',
+})
+
+#
+time_serious_invoice = go.Figure([go.Scatter(x=fd['InvoiceDate'], y=fd['Quantity'])])
+
+#
+new = summary_data_from_transaction_data(fd, 'Customer ID', 'InvoiceDate', monetary_value_col='TotalPurchase', observation_period_end='2011-12-9')
+new['percent'] = round((new['frequency'] / new['frequency'].sum()) * 100,2)
+frequency_barchart = px.bar(new, y=new['percent'], x=new['frequency'], title='Frequency BarChart', color='percent')
+
+
+app = Dash(
+    __name__,
+    # TODO: implement styles
+	external_stylesheets = [],
+    suppress_callback_exceptions=True
+)
+
+server=app.server
+
+app.layout = html.Div([
+    html.Div([
+		html.Div([
+			html.H1('CLV Project')
+		], id = 'title')
+	]),
+	html.Div([
+		dcc.Tabs(id='tabs', value='tab-1', children=[
+			dcc.Tab(label='CLV', value='clv-tab'),
+			dcc.Tab(label='DATA DESCRIPTION', value='data-description-tab'),
+			dcc.Tab(label='MODEL VISUALS', value='model-visuals-tab'),
+    	]),
+        html.Div(id='tab-content')
+	]),
+], className="container")
+
+def render_stats():
+    container_styles = {
+        'display': 'flex',
+        'flexWrap': 'wrap',
+        'width': '100%',
+    }
+
+    item_styles = {
+        'width': 'calc(50% - 128px)',
+        'margin': '64px',
+    }
+
+    html.Div([
+        html.Div([
+            html.Span(children="Total Customers"),
+            # TODO: show actual number
+            html.Span(children="10")
+        ], style=item_styles),
+        html.Div([
+            html.Span(children="Total Purchases"),
+            # TODO: show actual number
+            html.Span(children="10")
+        ], style=item_styles),
+    ], className='stats-container', style=container_styles)
+
+def render_clv_graphs():
+    container_styles = {
+        'display': 'flex',
+        'flexWrap': 'wrap',
+        'width': '100%',
+    }
+
+    graphs = html.Div([
+        html.Div([
+            # dcc.Graph(figure=)
+        ], style={}),
+        html.Div([
+            html.Div([
+                # dcc.Graph(figure=)
+            ]),
+            html.Div([
+                html.Div([
+                    # dcc.Graph(figure=)
+                ]),
+                html.Div([
+                    # dcc.Graph(figure=)
+                ])
+            ]),
+        ], style={
+            'display': 'flex',
+            'flexDirection': 'column',
+        }),
+    ], style=container_styles)
+
+    return graphs
+
+def render_data_description_graphs():
+    container_styles = {
+        'display': 'flex',
+        'flexWrap': 'wrap',
+        'width': '100%',
+    }
+
+    item_styles = {
+        'width': 'calc(50% - 128px)',
+        'margin': '64px',
+    }
+
+    graphs = html.Div([
+        html.Div([
+            dcc.Graph(figure=fir_plotbar),
+        ], style=item_styles),
+        html.Div([
+            dcc.Graph(figure=fig_miricle),
+        ], style=item_styles),
+        html.Div([
+            dcc.Graph(figure=time_serious_invoice),
+        ], style=item_styles),
+        html.Div([
+            dcc.Graph(figure=frequency_barchart),
+        ], style=item_styles),
+    ], style=container_styles)
+
+    return graphs
 
 @app.callback(
-    [
-        Output("id_total_customer", 'children'),
-        Output("id_total_transactions", 'children'),
-        Output("id_total_sales", 'children'),
-        Output("id_order_value", 'children'), 
-        # Output("id_churn", 'children'), 
-        Output("id-results", 'data'), 
-        Output("fig-UnitPriceVsQuantity", 'figure'),
-        Output("fig-ProductPie", 'figure'), 
-    ],
-    [
-        Input("id-country-dropdown", "value")
-    ]
+    Output('tab-content', 'children'),
+    Input('tabs', 'value')
 )
-def update_output_All(country_selected):
+def render_content(tab):
+    if tab == 'clv-tab':
+        return html.Div([
+            render_clv_graphs()
+        ], id='data-description-tab')
 
-    try:
-        if (country_selected != 'All' and country_selected != None):
-            df_selectedCountry = pp.filtered_data.loc[pp.filtered_data['Country'] == country_selected]
-            df_selectedCountry_p = pp.filtered_data_group.loc[pp.filtered_data_group['Country'] == country_selected]
-
-            cnt_transactions = df_selectedCountry.Country.shape[0]
-            cnt_customers = len(df_selectedCountry.CustomerID.unique())
-            cnt_sales = round(df_selectedCountry.groupby('Country').agg({'TotalPurchase':'sum'})['TotalPurchase'].sum(),2)
-            
-            cnt_avgsales = round(df_selectedCountry_p.groupby('Country').agg({'avg_order_value': 'mean'})['avg_order_value'].mean())
-
-            
-            repeat_rate = round(df_selectedCountry_p[df_selectedCountry_p.num_transactions > 1].shape[0]/df_selectedCountry_p.shape[0],2)
-            churn_rate = round(1-repeat_rate,2)
-            
-
-            
-            df2 = pp.df_plot.loc[pp.df_plot['Country'] == country_selected]
-            fig_UnitPriceVsQuantity_country = px.scatter(df2[:25000], x="UnitPrice", y="TotalPurchase", color = 'Quantity', 
-                    size='Quantity',  size_max=20, log_y= True, log_x= True, title= "PURCHASE TRENDS FOR SELECTED COUNTRY")
-            
-            df_plot_bar = df_selectedCountry.groupby('Description').agg({'TotalPurchase':'sum'}).sort_values(by = 'TotalPurchase', ascending=False).reset_index().head(5)
-            df_plot_bar['percent'] = round((df_plot_bar['TotalPurchase'] / df_plot_bar['TotalPurchase'].sum()) * 100,2)
-
-            fir_plotbar = px.bar(df_plot_bar, y='percent', x='Description', title='Top selling products', 
-                    text='percent', color='percent')
-            fir_plotbar.update_traces(texttemplate='%{text:.2s}', textposition='inside')
-            fir_plotbar.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',showlegend=False)                
-            
-            return [cnt_customers, cnt_transactions, cnt_sales, cnt_avgsales,  df_selectedCountry_p.drop(['num_days','num_units'], axis = 1).to_dict('records'),
-                    fig_UnitPriceVsQuantity_country, fir_plotbar]
-
-        else:
-            
-            cnt_transactions = pp.filtered_data.shape[0]
-            cnt_customers = len(pp.filtered_data.CustomerID.unique())
-            cnt_sales = round(pp.filtered_data.groupby('Country').agg({'TotalPurchase':'sum'})['TotalPurchase'].sum(),2)
-            cnt_avgsales = round(pp.filtered_data_group.groupby('Country').agg({'avg_order_value': 'mean'})['avg_order_value'].mean())
+    if tab == 'data-description-tab':
+        return html.Div([
+            render_data_description_graphs()
+        ], id='data-description-tab')
 
 
-            repeat_rate = round(pp.filtered_data_group[pp.filtered_data_group.num_transactions > 1].shape[0]/pp.filtered_data_group.shape[0],2)
-            churn_rate = round(1-repeat_rate,2)
-
-            # Bar chart listing top products
-            df_plot_bar = pp.filtered_data.groupby('Description').agg({'TotalPurchase':'sum'}).sort_values(by = 'TotalPurchase', ascending=False).reset_index().head(5)
-            df_plot_bar['percent'] = round((df_plot_bar['TotalPurchase'] / df_plot_bar['TotalPurchase'].sum()) * 100,2).apply(lambda x : "{:,}".format(x))
-
-            fir_plotbar = px.bar(df_plot_bar, y='percent', x='Description', title='TOP SELLING PRODUCTS', text='percent', color='percent',)
-            fir_plotbar.update_traces(texttemplate='%{text:.2s}', textposition='inside')
-            fir_plotbar.update_layout(uniformtext_minsize=8, uniformtext_mode='hide', showlegend=False)
-            
-            return [cnt_customers, cnt_transactions, cnt_sales,cnt_avgsales,  pp.filtered_data_group.drop(['num_days','num_units'], axis = 1).to_dict('records'),
-                    pp.fig_UnitPriceVsQuantity, fir_plotbar]
-
-    
-    
-    except Exception as e:
-        logging.exception('Something went wrong with interaction logic:', e)
-
-
-
-
-if __name__ == '__main__':
-    app.run_server(debug=True, use_reloader=False, dev_tools_ui=False)
-
+if __name__=='__main__':
+	app.run_server(debug=True)
